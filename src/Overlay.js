@@ -100,6 +100,10 @@ function Customizer() {
         GO BACK
         <AiOutlineArrowLeft size="1.3em" />
       </button>
+      <button className="flip" style={{ background: snap.color }} onClick={() => (state.flip = !state.flip)}>
+        FLIP
+        <AiOutlineArrowLeft size="1.3em" />
+      </button>
     </div>
   )
 }
