@@ -7,6 +7,7 @@ import { state } from './store'
 import * as THREE from 'three'
 
 
+//canvas component
 export const App = ({ position = [0, 0, 190], fov = 25 }) => (
   <Canvas shadows camera={{ position, fov }} gl={{ preserveDrawingBuffer: true }} eventSource={document.getElementById('root')} eventPrefix="client">
     <ambientLight intensity={0.5} />
@@ -20,7 +21,9 @@ export const App = ({ position = [0, 0, 190], fov = 25 }) => (
   </Canvas>
 )
 
-function Backdrop() {
+
+//background component
+export function Backdrop() {
   const shadows = useRef()
   useFrame((state, delta) => easing.dampC(shadows.current.getMesh().material.color, state.color, 0.25, delta))
   return (
@@ -31,7 +34,7 @@ function Backdrop() {
   )
 }
 
-function CameraRig({ children }) {
+export function CameraRig({ children }) {
   const group = useRef()
   const snap = useSnapshot(state)
   useFrame((state, delta) => {
@@ -42,7 +45,9 @@ function CameraRig({ children }) {
   return <group ref={group}>{children}</group>
 }
 
-function Shirt(props) {
+
+//jersey model component
+export function Shirt(props) {
   const snap = useSnapshot(state)
   const mesh = useRef()
   const sponsor = useRef()
@@ -91,8 +96,6 @@ function Shirt(props) {
   useFrame((state, delta) => easing.dampC(materials.initialShadingGroup.color, snap.color, 0.25, delta))
   useFrame((state, delta) => {
     snap.intro ? mesh.current.rotation.z = state.clock.elapsedTime : easing.dampE(mesh.current.rotation, [1.7, 0, snap.flip ? 3 : 0], 0.25, delta)
-    // snap.flip ? easing.dampE(mesh.current.rotation, [1.7, 0, 3], 0.25, delta) : easing.dampE(mesh.current.rotation, [1.7, 0, 0], 0.25, delta)
-    // mesh.current.rotation.z = state.clock.elapsedTime
   })
   
 
@@ -103,16 +106,12 @@ function Shirt(props) {
   useEffect(() => {
     const decal = sponsor.current
     decal?.addEventListener("onpointerover", handleHover)
-    // console.log(sponsor.current)
-    // console.log(sponsor.current.addEventListener())
   }, [sponsor])
   return (
     <mesh ref={mesh} rotation={[1.7, 0, snap.flip ? 3 : 0]} castShadow geometry={nodes.shirt.geometry} material={materials.initialShadingGroup} material-roughness={1} {...props} dispose={null}>
       
+      {/* render each of the textures (including sponsors texture, club texture, number and name textures) as a decal so they appear printed on the jersey */}
       <Decal ref={sponsor} scale={20} position={[0, 10.15, -3]} rotation={[-1.7, 0, 0]} map-anisotropy={16}>
-        {/* <meshBasicMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false} >
-          <SponsorTexture />
-        </meshBasicMaterial> */}
         <meshBasicMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false}>
           <RenderTexture attach={'map'}>
             <PerspectiveCamera makeDefault manual position={[1.5, 0, 5]} />
@@ -122,7 +121,6 @@ function Shirt(props) {
       </Decal>
       <Decal ref={club} scale={6} position={[9, 10.15, -18]} rotation={[-1.7, 0, 0]} map-anisotropy={16} >
         <meshStandardMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false}>
-          {/* <ClubTexture texture={`/${snap.decal}.png`} /> */}
           <RenderTexture attach={'map'}>
             <PerspectiveCamera makeDefault manual position={[1.5, 0, 5]}  />
             <Image position={[1.5, 0, 0]} scale={[4, 4, 1]} onPointerOver={(e) => (console.log(e))} url={`/${snap.decal}.png`} />
@@ -131,8 +129,6 @@ function Shirt(props) {
       </Decal>
       <Decal ref={smallSponsor} scale={6} position={[-9, 10.15, -18]} rotation={[-1.7, 0, 0]} map-anisotropy={16} >
         <meshStandardMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false}>
-          {/* <color attach='background' args={['#000']} /> */}
-          {/* <SmallSponsorTexture /> */}
           <RenderTexture attach={'map'}>
             <PerspectiveCamera makeDefault manual position={[1.5, 0, 5]}  />
             <Image position={[1.5, 0, 0]} scale={[4, 4, 1]} onPointerOver={(e) => (console.log(e))} url={`nikee.png`} />
@@ -140,59 +136,22 @@ function Shirt(props) {
         </meshStandardMaterial>
       </Decal>
       <Decal scale={[30, 30, 30]} position={[0, -10.15, -26]} rotation={[-1.7, 3, 0]} >
-        {/* <Text position={[0, 10.15, 0]} rotation={[-1.7, 0, 0]} color={'#000'} scale={20}>STUFF</Text> */}
         <meshBasicMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false}>
           <NameTexture />
         </meshBasicMaterial>
       </Decal>
       <Decal position={[0, -10.15, 0]} rotation={[-1.7, 3, 0]} scale={20} >
-        {/* <Text position={[0, 10.15, 0]} rotation={[-1.7, 0, 0]} color={'#000'} scale={20}>STUFF</Text> */}
         <meshBasicMaterial transparent polygonOffset polygonOffsetFactor={-100} toneMapped={false}>
           <NumberTexture />
         </meshBasicMaterial>
       </Decal>
-      {/* <Text color={'#000'} scale={10} position={[4, -20.04, -18]} rotation={[-1.7, 3, 0]}>STUFF</Text> */}
     </mesh>
   )
 }
 
 
-
-// function ClubTexture({texture}) {
-//   return (
-//     <RenderTexture attach='map' anisotropy={16}>
-//       <PerspectiveCamera makeDefault manual position={[1.5, 0, 5]} />
-//       <Image onPointerOver={(e)=> (console.log(e))} scale={[4, 4, 0]} position={[1.5,0,0]} url={texture} />
-//     </RenderTexture>
-//   )
-// }
-
-// function SmallSponsorTexture() {
-//   return (
-//     <RenderTexture attach='map' anisotropy={16}>
-//       <PerspectiveCamera makeDefault manual position={[1.5, 0, 5]} />
-//       <Image scale={[4, 4, 0]} position={[1.5, 0, 0]} url='nikee.png' />
-//     </RenderTexture>
-//   )
-// }
-
-// function SponsorTexture() {
-//   const textRef = useRef()
-//   useEffect(() => {
-//     textRef.current.name = 'sponsor'
-//   }, [])
-//   return (
-//     <RenderTexture attach="map" anisotropy={16}>
-//       <PerspectiveCamera makeDefault manual aspect={1 / 1} position={[1.5, 0, 5]} />
-//       {/* <Center position={[1.9, -1, 0]}> */}
-//         <Image  onPointerOver={(e) => ( console.log('over'))} ref={textRef} scale={[3.1, 4, 0]} url='threee.png' />
-//         {/* <Text ref={textRef} color={'#fff'} rotation={[0, 0, 0]}>TEST</Text> */}
-//       {/* </Center> */}
-//     </RenderTexture>
-//   )
-// }
-
-function NameTexture() {
+//decal name texture (this appears at the back of the jersey)
+export function NameTexture() {
   const textRef = useRef()
   useEffect(() => {
     textRef.current.name ='name'
@@ -207,7 +166,9 @@ function NameTexture() {
   )
 }
 
-function NumberTexture() {
+
+//decal number texture (this appears at the back as well)
+export function NumberTexture() {
   const textRef = useRef()
   useEffect(() => {
     textRef.current.name = 'number'
@@ -222,5 +183,7 @@ function NumberTexture() {
   )
 }
 
+
+//preload model and textures
 useGLTF.preload('/shirt.glb')
 ;['/arsenal.png', '/liverpool.png', '/chelsea.png', '/leicester.png'].forEach(useTexture.preload)

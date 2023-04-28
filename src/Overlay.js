@@ -4,6 +4,8 @@ import { AiFillCamera, AiOutlineArrowLeft, AiOutlineHighlight, AiOutlineShopping
 import { useSnapshot } from 'valtio'
 import { state } from './store'
 
+
+//HTML Overlay component
 export function Overlay() {
   const snap = useSnapshot(state)
   const transition = { type: 'spring', duration: 0.8 }
@@ -12,6 +14,7 @@ export function Overlay() {
     animate: { x: 0, opacity: 1, transition: { ...transition, delay: 0 } },
     exit: { x: -100, opacity: 0, transition: { ...transition, delay: 0 } }
   }
+  //animate entry with framer motion
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
       <motion.header initial={{ opacity: 0, y: -100 }} animate={{ opacity: 1, y: 0 }} transition={transition}>
@@ -49,8 +52,8 @@ export function Overlay() {
                   <p>
                   Introducing our <strong>latest 3D customization tool</strong> that enables you to design your own jersey, reflecting your unique style. Our tool provides a canvas for your imagination to run free and explore a variety of customization options.
                   </p>
-                  <button style={{ background: snap.color }} onClick={() => (state.intro = false)}>
-                    CUSTOMIZE IT <AiOutlineHighlight size="1.3em" />
+                  <button hidden='true' className='CTA' role='CTAButton' style={{ background: snap.color }} onClick={() => (state.intro = false)}>
+                    CUSTOMIZE IT
                   </button>
                 </motion.div>
               </div>
@@ -66,10 +69,13 @@ export function Overlay() {
   )
 }
 
-function Customizer() {
+
+//customizer page component
+export function Customizer() {
   const snap = useSnapshot(state)
   return (
     <div className="customizer">
+      {/* options to customise the jersey  */}
       <div className="color-options">
         {snap.colors.map((color) => (
           <div key={color} className={`circle`} style={{ background: color }} onClick={() => (state.color = color)}></div>
@@ -84,6 +90,7 @@ function Customizer() {
           ))}
         </div>
       </div>
+      {/* buttons in the customizer page  */}
       <button
         className="share"
         style={{ background: snap.color }}

@@ -1,5 +1,6 @@
 import { proxy } from 'valtio'
 
+//state management for the changing colors, changing decals and so on
 const state = proxy({
   intro: true,
   flip: false,
